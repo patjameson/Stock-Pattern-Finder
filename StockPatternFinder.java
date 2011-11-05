@@ -56,12 +56,15 @@ public class StockPatternFinder {
 					curM = (((end[0]-start[0]+1) * sumXY) - (sumX * sumY)) / (((end[0]-start[0]+1) * sumXsquared) - sumX*sumX);
 					curB = (sumY - (curM * sumX)) / (end[0]-start[0]+1);
 					
-					double SSerr = 0, SStot = 0;
+					double sumXYMean = 0, sumXYSquaredMeanX = 0, sumXYSquaredMeanY = 0;
 					for (int j = (int)start[0];j < end[0] + 1;j++) {
-						SSerr += (closePrices[j - 1] - (j*curM + curB)) * (closePrices[j - 1] - (j*curM + curB));
-						SStot += (closePrices[j - 1] - sumY/(end[0]-start[0]) * (closePrices[j - 1] - sumY/(end[0]-start[0])));
+						double XiX = j - sumX/(end[0]-start[0] + 1);
+						double YiY = closePrices[j - 1] - sumY/(end[0]-start[0] + 1);
+						sumXYMean += XiX*YiY;
+						sumXYSquaredMeanX += XiX*XiX;
+						sumXYSquaredMeanY += YiY*YiY; 
 					}
-					System.out.println("r^2 = " + (1-(SSerr/SStot)));
+					System.out.println("r = " + sumXYMean/(Math.sqrt(sumXYSquaredMeanX)*Math.sqrt(sumXYSquaredMeanY)));
 					
 					//find the slope ( m )
 					bestFitEquations[i - 1][0] = curM;
@@ -69,13 +72,11 @@ public class StockPatternFinder {
 					//find the y-intercept ( b )
 					bestFitEquations[i - 1][1] = curB;
 					
-					bestFitEquations[i - 1][2] = start[0];
-					bestFitEquations[i - 1][3] = end[0];
+					bestFitEquations[i - 1][2] = start[0]-1;
+					bestFitEquations[i - 1][3] = end[0]-1;
 					
 					start = end;
 					end = new double[]{-1, 0};
-					
-					
 				}
 			}
 		}
@@ -95,8 +96,8 @@ public class StockPatternFinder {
 		//find the y-intercept ( b )
 		bestFitEquations[closePrices.length][1] = curB;
 		
-		bestFitEquations[closePrices.length][2] = start[0];
-		bestFitEquations[closePrices.length][3] = closePrices.length;
+		bestFitEquations[closePrices.length][2] = start[0]-1;
+		bestFitEquations[closePrices.length][3] = closePrices.length-1;
 		
 		return bestFitEquations;
 	}
